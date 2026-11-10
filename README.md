@@ -33,7 +33,7 @@ Prerequisites: Node 22 (`nvm use`), and pnpm 12 (`npm i -g pnpm@12`).
 
 ```bash
 pnpm install
-pnpm dev                      # web + mobile together
+pnpm dev                      # web + mobile together (select a task in the terminal UI to interact with it)
 ```
 
 Or run them one at a time:

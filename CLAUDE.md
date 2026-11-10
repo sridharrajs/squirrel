@@ -28,10 +28,10 @@ From the repo root:
 
 ```bash
 pnpm install
-pnpm dev          # turbo: web + mobile dev servers together
-pnpm build        # turbo: production builds
-pnpm lint
-pnpm typecheck
+pnpm dev          # turbo: web (next dev) + mobile (expo start) together, in turbo's interactive TUI
+pnpm build        # turbo: production builds (web only; mobile builds go through EAS)
+pnpm lint         # web: eslint; mobile: expo lint. packages/core has no lint config
+pnpm typecheck    # all three packages
 pnpm --filter @sq/web dev       # run a script in one package
 ```
 
@@ -40,7 +40,7 @@ Web (`apps/web`):
 - `typecheck` runs `next typegen` first, because types like `LayoutProps` are generated.
 
 Mobile (`apps/mobile`):
-- `npx expo start`, then press `a` for the Android emulator or `i` for the iOS simulator.
+- `npx expo start`, then press `a` for the Android emulator or `i` for the iOS simulator. Under `pnpm dev`, select the mobile task in turbo's terminal UI before pressing keys.
 - Add packages with `npx expo install <pkg>`, not `pnpm add`, so versions match the Expo SDK.
 - `npx expo-doctor` diagnoses config and dependency issues.
 
@@ -110,14 +110,12 @@ packages/core  Shared TypeScript source, no build step: Drizzle schema in src/sc
 - `apps/web/src/db/index.ts` exports a Drizzle client.
 - It starts with `import 'server-only'`, so importing it from client components fails the build.
 
-**Auth (single owner, no signup):**
-- The `users` table holds one row with an argon2/bcrypt password hash, created by a seed script (`db:seed`, not written yet) that prompts for the password. Re-running it changes the password. Never put a plain-text password in code, git or seed files.
-- `POST /api/login` checks the password and issues a JWT signed with `SESSION_SECRET`: as an HttpOnly cookie for web, or as a token for mobile.
-  - The mobile app stores the token in expo-secure-store and sends it as `Authorization: Bearer`.
-- Middleware protects every page and API route except `/login`, `/api/login` and cron endpoints. Check the Next.js 16 docs for the current middleware/proxy file convention before writing it.
-- Password hashing must run in the Node runtime (login route only). Middleware only verifies the JWT, with `jose`.
-- Signing tokens without a sessions table means rotating `SESSION_SECRET` signs out every device. Add a `sessions` table if you need to sign out a single device.
-- Cron endpoints are protected by `CRON_SECRET`, not by the user login.
+**Auth (planned; not built yet):**
+- Single owner, no signup. One row in `users` holds a password hash, created by a seed script that prompts for the password.
+- Login issues a JWT signed with `SESSION_SECRET`: an HttpOnly cookie for web, a Bearer token for mobile.
+- Password hashing runs only in the Node runtime. Middleware/proxy only verifies the JWT.
+- Cron endpoints use `CRON_SECRET` instead of the user login.
+- Fill in the details here once auth is built.
 
 **Secrets:**
 - They live in Vercel env vars, plus `apps/web/.env.local` for local dev; `.env.example` lists them.
