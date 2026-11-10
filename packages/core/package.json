@@ -1,0 +1,20 @@
+{
+  "name": "@sq/core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./schema": "./src/schema/index.ts",
+    "./schema/synced": "./src/schema/synced.ts",
+    "./schema/server": "./src/schema/server.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "drizzle-orm": "0.45.4"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}
